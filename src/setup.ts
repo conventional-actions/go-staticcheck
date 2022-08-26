@@ -34,7 +34,7 @@ async function run(): Promise<void> {
       core.debug(`extracted to ${extPath}`)
 
       const toolPath = await tc.cacheDir(
-        extPath,
+        `${extPath}/staticcheck`,
         'staticcheck',
         version,
         os.arch()
