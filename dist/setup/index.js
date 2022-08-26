@@ -6561,21 +6561,26 @@ const tc = __importStar(__nccwpck_require__(7784));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 async function run() {
     try {
-        const osPlatform = os_1.default.platform();
-        const osArch = os_1.default.arch() === 'x64' ? 'amd64' : os_1.default.arch();
-        const versionSpec = core.getInput('version') || 'latest';
-        core.debug(`Downloading ${versionSpec} ${osPlatform} ${osArch} version`);
-        const url = versionSpec === 'latest'
-            ? `https://github.com/dominikh/go-tools/releases/latest/download/staticcheck_${osPlatform}_${osArch}.tar.gz`
-            : `https://github.com/dominikh/go-tools/releases/download/${versionSpec}/staticcheck_${osPlatform}_${osArch}.tar.gz`;
-        core.info(`Downloading ${versionSpec} ${osPlatform} ${osArch} from ${url}`);
-        const downloadPath = await tc.downloadTool(url);
-        core.debug(`Downloaded ${versionSpec} ${osPlatform} ${osArch} to ${downloadPath}`);
-        const extPath = await tc.extractTar(downloadPath);
-        core.debug(`Extracted ${versionSpec} ${osPlatform} ${osArch} to ${extPath}`);
-        const toolPath = await tc.cacheDir(extPath, 'staticcheck', versionSpec, os_1.default.arch());
-        core.info(`Successfully extracted staticcheck ${versionSpec} ${osPlatform} ${osArch} to ${toolPath}`);
-        core.addPath(toolPath);
+        let version = core.getInput('version') || 'latest';
+        const manifest = await tc.getManifestFromRepo('conventional-actions', 'go-staticcheck', process.env['GITHUB_TOKEN'] || '', 'main');
+        core.debug(`manifest = ${JSON.stringify(manifest)}`);
+        const rel = await tc.findFromManifest(version === 'latest' ? '*' : version, true, manifest, os_1.default.arch());
+        core.debug(`rel = ${JSON.stringify(rel)}`);
+        if (rel && rel.files.length > 0) {
+            version = rel.version;
+            const downloadUrl = rel.files[0].download_url;
+            core.debug(`downloading from ${downloadUrl}`);
+            const downloadPath = await tc.downloadTool(downloadUrl);
+            core.debug(`downloaded to ${downloadPath}`);
+            const extPath = await tc.extractTar(downloadPath);
+            core.debug(`extracted to ${extPath}`);
+            const toolPath = await tc.cacheDir(extPath, 'staticcheck', version, os_1.default.arch());
+            core.debug(`tool path ${toolPath}`);
+            core.addPath(toolPath);
+        }
+        else {
+            throw new Error(`could not find staticcheck ${version} for ${os_1.default.arch()}`);
+        }
     }
     catch (error) {
         if (error instanceof Error)
