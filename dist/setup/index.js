@@ -6574,7 +6574,7 @@ async function run() {
             core.debug(`downloaded to ${downloadPath}`);
             const extPath = await tc.extractTar(downloadPath);
             core.debug(`extracted to ${extPath}`);
-            const toolPath = await tc.cacheDir(extPath, 'staticcheck', version, os_1.default.arch());
+            const toolPath = await tc.cacheDir(`${extPath}/staticcheck`, 'staticcheck', version, os_1.default.arch());
             core.debug(`tool path ${toolPath}`);
             core.addPath(toolPath);
         }
