@@ -1,0 +1,29 @@
+name: 'go-staticcheck'
+description: 'Run go-staticcheck'
+author: 'Conventional Actions'
+inputs:
+  version:
+    required: false
+    description: 'version of staticcheck to use'
+    default: latest
+  checks:
+    required: false
+    description: 'comma-separated list of checks to enable'
+  format:
+    required: false
+    default: stylish
+    description: "output format (valid choices are 'stylish', 'text' and 'json')"
+  tags:
+    required: false
+    description: 'comma-separated list of build tags'
+  package:
+    required: false
+    default: './...'
+    description: 'package to check'
+runs:
+  using: 'node16'
+  pre: 'dist/setup/index.js'
+  main: 'dist/main/index.js'
+branding:
+  icon: check-circle
+  color: purple
