@@ -7296,12 +7296,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const utils_1 = __nccwpck_require__(1314);
+const fs = __importStar(__nccwpck_require__(7147));
 async function run() {
     try {
+        const outputPath = core.getInput('output_path') || 'staticcheck.sarif';
         const format = core.getInput('format') || 'stylish';
         const checks = (0, utils_1.parseInputFiles)(core.getInput('checks') || 'all');
         const tags = (0, utils_1.parseInputFiles)(core.getInput('tags'));
-        const pkg = core.getInput('package') || './...';
+        const packages = (0, utils_1.parseInputFiles)(core.getInput('package') || './...');
         let args = ['-f', format];
         if (checks && checks.length) {
             args = args.concat('-checks', checks.join(','));
@@ -7309,8 +7311,10 @@ async function run() {
         if (tags && tags.length) {
             args = args.concat('-tags', tags.join(','));
         }
-        args = args.concat(pkg);
-        await exec.exec('staticcheck', args);
+        for (const pkg of packages) {
+            const output = await exec.getExecOutput('staticcheck', args.concat(pkg), { silent: true });
+            fs.writeFileSync(outputPath, output.stdout);
+        }
     }
     catch (error) {
         if (error instanceof Error)

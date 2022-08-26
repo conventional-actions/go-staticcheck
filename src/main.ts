@@ -1,13 +1,15 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import {parseInputFiles} from './utils'
+import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
+    const outputPath = core.getInput('output_path') || 'staticcheck.sarif'
     const format = core.getInput('format') || 'stylish'
     const checks = parseInputFiles(core.getInput('checks') || 'all')
     const tags = parseInputFiles(core.getInput('tags'))
-    const pkg = core.getInput('package') || './...'
+    const packages = parseInputFiles(core.getInput('package') || './...')
 
     let args: string[] = ['-f', format]
     if (checks && checks.length) {
@@ -18,9 +20,12 @@ async function run(): Promise<void> {
       args = args.concat('-tags', tags.join(','))
     }
 
-    args = args.concat(pkg)
-
-    await exec.exec('staticcheck', args)
+    for (const pkg of packages) {
+      const output = await exec.getExecOutput('staticcheck', args.concat(pkg), {
+        silent: true
+      })
+      fs.writeFileSync(outputPath, output.stdout)
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

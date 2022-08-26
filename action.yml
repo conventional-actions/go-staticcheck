@@ -6,13 +6,17 @@ inputs:
     required: false
     description: 'version of staticcheck to use'
     default: latest
+  output_path:
+    required: false
+    description: 'output file path'
+    default: staticcheck.sarif
   checks:
     required: false
     description: 'comma-separated list of checks to enable'
   format:
     required: false
-    default: stylish
-    description: "output format (valid choices are 'stylish', 'text' and 'json')"
+    default: sarif
+    description: "output format (valid choices are 'sarif', 'stylish', 'text' and 'json')"
   tags:
     required: false
     description: 'comma-separated list of build tags'
@@ -20,6 +24,9 @@ inputs:
     required: false
     default: './...'
     description: 'package to check'
+outputs:
+  output_path:
+    description: 'output file path'
 runs:
   using: 'node16'
   pre: 'dist/setup/index.js'
