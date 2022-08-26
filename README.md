@@ -15,7 +15,7 @@ To use the GitHub Action, add the following to your job:
 | Name      | Default  | Description                                                    |
 |-----------|----------|----------------------------------------------------------------|
 | `version` | `latest` | the version of staticcheck to install                          |
-| `checks`  | all      | comma-separated list of checks to enable                       |
+| `checks`  | `all`    | comma-separated list of checks to enable                       |
 | `format`  | `json`   | output format (valid choices are 'stylish', 'text' and 'json') |
 | `tags`    | N/A      | comma-separated list of build tags                             |
 
