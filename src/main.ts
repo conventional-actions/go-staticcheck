@@ -25,6 +25,7 @@ async function run(): Promise<void> {
         silent: true
       })
       fs.writeFileSync(outputPath, output.stdout)
+      core.setOutput('output_path', outputPath)
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)

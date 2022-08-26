@@ -7312,8 +7312,11 @@ async function run() {
             args = args.concat('-tags', tags.join(','));
         }
         for (const pkg of packages) {
-            const output = await exec.getExecOutput('staticcheck', args.concat(pkg), { silent: true });
+            const output = await exec.getExecOutput('staticcheck', args.concat(pkg), {
+                silent: true
+            });
             fs.writeFileSync(outputPath, output.stdout);
+            core.setOutput('output_path', outputPath);
         }
     }
     catch (error) {
